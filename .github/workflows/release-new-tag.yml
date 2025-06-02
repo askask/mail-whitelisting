@@ -1,22 +1,12 @@
-name: Build for development
+name: Release new tag
 
 on:
   push:
-    branches: [ 'feature/**' ]
-  pull_request:
-    branches: [ develop, main ]
-    types: [ opened, ready_for_review ]
-  pull_request_target:
-    branches: [ develop, main ]
-    types: [ closed ]
-  workflow_dispatch:
-
-
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
   docker:
-    if: github.event.pull_request.merged == true
-
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -31,8 +21,11 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push
+      - name: Build and push docker image
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ghcr.io/highmed-ev/hive-keycloak-mail-whitelisting:develop
+          tags: ghcr.io/highmed-ev/hive-keycloak-mail-whitelisting:${{ github.ref_name }}
+      - name: Print Release Version
+        run: |
+          echo "### :rocket: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
