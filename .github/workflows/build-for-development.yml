@@ -11,6 +11,8 @@ on:
     types: [ closed ]
   workflow_dispatch:
 
+
+
 jobs:
   docker:
     if: github.event.pull_request.merged == true
